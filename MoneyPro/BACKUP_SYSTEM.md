@@ -1,8 +1,8 @@
-# TEST Sistema di Backup e Persistenza - Money Manager
+# TEST Sistema di Backup e Persistenza - Money Pro
 
 ## Panoramica
 
-Il sistema di backup e persistenza di Money Manager garantisce che i tuoi dati rimangano al sicuro anche se disinstalli e reinstalli l'app. Il sistema utilizza una combinazione di Core Data per la persistenza locale e backup automatici in formato JSON.
+Il sistema di backup e persistenza di Money Pro garantisce che i tuoi dati rimangano al sicuro anche se disinstalli e reinstalli l'app. Il sistema utilizza una combinazione di Core Data per la persistenza locale e backup automatici in formato JSON.
 
 ## Caratteristiche Principali
 
@@ -57,19 +57,19 @@ Quando l'app viene avviata:
 ## Utilizzo
 
 ### Creare un Backup Manuale
-1. Apri l'app Money Manager
+1. Apri l'app Money Pro
 2. Vai nelle Impostazioni (icona ingranaggio)
 3. Tocca "Crea Backup"
 4. Conferma l'operazione
 
 ### Ripristinare un Backup
-1. Apri l'app Money Manager
+1. Apri l'app Money Pro
 2. Vai nelle Impostazioni
 3. Tocca "Ripristina Backup"
 4. Conferma l'operazione (i dati attuali verranno sovrascritti)
 
 ### Eliminare un Backup
-1. Apri l'app Money Manager
+1. Apri l'app Money Pro
 2. Vai nelle Impostazioni
 3. Tocca "Elimina Backup"
 4. Conferma l'operazione

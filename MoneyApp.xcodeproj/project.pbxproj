@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		A97C17B22E2EE9C900F92151 /* Money Manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Money Manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A97C17B22E2EE9C900F92151 /* Money Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Money Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A97C17B42E2EE9C900F92151 /* MoneyApp */ = {
+		A97C17B42E2EE9C900F92151 /* MoneyPro */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MoneyApp;
+			path = MoneyPro;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		A97C17A92E2EE9C900F92151 = {
 			isa = PBXGroup;
 			children = (
-				A97C17B42E2EE9C900F92151 /* MoneyApp */,
+				A97C17B42E2EE9C900F92151 /* MoneyPro */,
 				A97C17B32E2EE9C900F92151 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		A97C17B32E2EE9C900F92151 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A97C17B22E2EE9C900F92151 /* Money Manager.app */,
+				A97C17B22E2EE9C900F92151 /* Money Pro.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A97C17B12E2EE9C900F92151 /* Money Manager */ = {
+		A97C17B12E2EE9C900F92151 /* Money Pro */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A97C17BD2E2EE9CA00F92151 /* Build configuration list for PBXNativeTarget "Money Manager" */;
+			buildConfigurationList = A97C17BD2E2EE9CA00F92151 /* Build configuration list for PBXNativeTarget "Money Pro" */;
 			buildPhases = (
 				A97C17AE2E2EE9C900F92151 /* Sources */,
 				A97C17AF2E2EE9C900F92151 /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A97C17B42E2EE9C900F92151 /* MoneyApp */,
+				A97C17B42E2EE9C900F92151 /* MoneyPro */,
 			);
-			name = "Money Manager";
+			name = "Money Pro";
 			packageProductDependencies = (
 			);
-			productName = "Money Manager";
-			productReference = A97C17B22E2EE9C900F92151 /* Money Manager.app */;
+			productName = "Money Pro";
+			productReference = A97C17B22E2EE9C900F92151 /* Money Pro.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A97C17B12E2EE9C900F92151 /* Money Manager */,
+				A97C17B12E2EE9C900F92151 /* Money Pro */,
 			);
 		};
 /* End PBXProject section */
@@ -251,11 +251,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QW6C5DWJQ4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -265,8 +267,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.marco.PiggyBank;
+				MARKETING_VERSION = 1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marco.moneypro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -279,11 +281,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QW6C5DWJQ4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -293,8 +297,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.marco.PiggyBank;
+				MARKETING_VERSION = 1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marco.moneypro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -314,7 +318,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A97C17BD2E2EE9CA00F92151 /* Build configuration list for PBXNativeTarget "Money Manager" */ = {
+		A97C17BD2E2EE9CA00F92151 /* Build configuration list for PBXNativeTarget "Money Pro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A97C17BE2E2EE9CA00F92151 /* Debug */,

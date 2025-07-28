@@ -23,7 +23,7 @@ struct WelcomeView: View {
                         .cornerRadius(20)
                     
                     // App Name
-                    Text("Money Manager")
+                                            Text("Money Pro")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(Colors.primaryText)
                     
