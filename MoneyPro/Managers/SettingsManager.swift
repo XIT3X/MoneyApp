@@ -19,9 +19,8 @@ class SettingsManager: ObservableObject {
     // MARK: - Public Methods
     func updatePeriod(_ period: Period) {
         selectedPeriod = period
-        currentMonthOffset = 0
         saveSelectedPeriod(period)
-        saveMonthOffset(0)
+        // Non resettare l'offset del mese quando cambi periodo
     }
     
     func updateMonthOffset(_ offset: Int) {
@@ -57,6 +56,6 @@ class SettingsManager: ObservableObject {
     }
     
     private static func loadMonthOffset() -> Int {
-        return 0 // Always start with current month
+        return UserDefaults.standard.integer(forKey: "month_offset_key")
     }
 }

@@ -8,6 +8,8 @@ struct MainView: View {
     @State private var transactionToEdit: Transaction?
     @State private var showingSettings = false
     @State private var showingPeriodSheet = false
+    @State private var showingExpenseView = false
+    @State private var showingIncomeView = false
     @State private var selectedCategory: String? = nil
     @State private var futureCheckTimer: Timer?
     @State private var dragOffset: CGFloat = 0
@@ -87,8 +89,11 @@ struct MainView: View {
                             }
                         }
                         // Se è tra le due soglie, mantieni lo stato attuale
-                    }
+                    },
+                    onExpenseTap: handleExpenseTap,
+                    onIncomeTap: handleIncomeTap
                 )
+                
             }
             .background(Colors.primaryBackground)
             .navigationBarHidden(true)
@@ -96,6 +101,8 @@ struct MainView: View {
                 showingNewTransaction: $showingNewTransaction,
                 showingSettings: $showingSettings,
                 showingPeriodSheet: $showingPeriodSheet,
+                showingExpenseView: $showingExpenseView,
+                showingIncomeView: $showingIncomeView,
                 showingWelcome: $settingsManager.showingWelcome,
                 transactionToEdit: transactionToEdit,
                 selectedPeriod: $settingsManager.selectedPeriod,
@@ -195,7 +202,17 @@ struct MainView: View {
     }
     
     private func handlePeriodSelected() {
+        // Salva il periodo selezionato
+        settingsManager.updatePeriod(settingsManager.selectedPeriod)
         settingsManager.resetToCurrentMonth()
+    }
+    
+    private func handleExpenseTap() {
+        showingExpenseView = true
+    }
+    
+    private func handleIncomeTap() {
+        showingIncomeView = true
     }
     
     private func handleAppear() {
@@ -241,6 +258,8 @@ extension View {
         showingNewTransaction: Binding<Bool>,
         showingSettings: Binding<Bool>,
         showingPeriodSheet: Binding<Bool>,
+        showingExpenseView: Binding<Bool>,
+        showingIncomeView: Binding<Bool>,
         showingWelcome: Binding<Bool>,
         transactionToEdit: Transaction?,
         selectedPeriod: Binding<Period>,
@@ -275,6 +294,18 @@ extension View {
                 ) {
                     onPeriodSelected()
                 }
+            }
+            .sheet(isPresented: showingExpenseView) {
+                ExpenseView(isPresented: showingExpenseView)
+                    .presentationDetents([.fraction(0.92)])
+                    .presentationDragIndicator(.hidden)
+                    .presentationBackground(.clear)
+            }
+            .sheet(isPresented: showingIncomeView) {
+                IncomeView(isPresented: showingIncomeView)
+                    .presentationDetents([.fraction(0.92)])
+                    .presentationDragIndicator(.hidden)
+                    .presentationBackground(.clear)
             }
             .fullScreenCover(isPresented: showingWelcome) {
                 WelcomeView(isPresented: showingWelcome) {

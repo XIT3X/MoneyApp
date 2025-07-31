@@ -16,6 +16,8 @@ struct MainScrollContent: View {
     let onDragEnded: (CGFloat) -> Void
     let onTransactionTap: (Transaction) -> Void
     let onScrollOffsetChanged: (CGFloat) -> Void
+    let onExpenseTap: () -> Void
+    let onIncomeTap: () -> Void
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -34,7 +36,12 @@ struct MainScrollContent: View {
                         EmptyStateView()
                     } else {
                         // Card Entrate e Spese
-                        IncomeExpenseCards(expenses: expenses, income: income)
+                        IncomeExpenseCards(
+                            expenses: expenses, 
+                            income: income,
+                            onExpenseTap: onExpenseTap,
+                            onIncomeTap: onIncomeTap
+                        )
                             .padding(.top, 16)
                             .padding(.bottom, 6) // Aggiunto spazio sotto i rettangoli
                         
@@ -89,9 +96,23 @@ private struct TotalAmountSection: View {
                 
                 // Griglia con outline e sfumatura sui lati
                 GridPattern()
-                    .stroke(Colors.limeGreen , lineWidth: 1)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Colors.primaryColor.opacity(0.0),
+                                Colors.primaryColor.opacity(0.2),
+                                Colors.primaryColor.opacity(0.4),
+                                Colors.primaryColor.opacity(0.4),
+                                Colors.primaryColor.opacity(0.2),
+                                Colors.primaryColor.opacity(0.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 1
+                    )
                     .frame(width: 340, height: 150) // Griglia più larga a destra e sinistra
-                    .opacity(0.25) // Opacità al 50%
+                    .opacity(0.1) // Opacità al 50%
                     .mask(
                         Ellipse()
                             .fill(
@@ -107,9 +128,22 @@ private struct TotalAmountSection: View {
                 
                 // Quadrati colorati randomicamente
                 ColoredSquaresPattern()
-                    .fill(Colors.limeGreen)
+                    .fill(
+                        LinearGradient(
+                        gradient: Gradient(colors: [
+                            Colors.primaryColor.opacity(0.0),
+                            Colors.primaryColor.opacity(0.2),
+                            Colors.primaryColor.opacity(0.4),
+                            Colors.primaryColor.opacity(0.4),
+                            Colors.primaryColor.opacity(0.2),
+                            Colors.primaryColor.opacity(0.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),)
+                
                     .frame(width: 340, height: 150)
-                    .opacity(0.09)
+                    .opacity(0.05)
                     .mask(
                         Ellipse()
                             .fill(
@@ -118,6 +152,7 @@ private struct TotalAmountSection: View {
                                     center: .center,
                                     startRadius: 0,
                                     endRadius: 150
+                                    
                                 )
                             )
                             .scaleEffect(x: 1.5, y: 0.9)

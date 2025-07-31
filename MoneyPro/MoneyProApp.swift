@@ -13,9 +13,7 @@ struct MoneyProApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView()
-                .font(.system(size: 17, weight: .regular, design: .rounded))
-                .lockOrientation(.portrait)
+            RootView()
         }
     }
 }

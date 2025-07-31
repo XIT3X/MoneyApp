@@ -16,4 +16,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return AppDelegate.orientationLock
     }
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        // Configura lo splash screen
+        if let windowScene = application.connectedScenes.first as? UIWindowScene {
+            windowScene.windows.first?.backgroundColor = .black
+        }
+        return true
+    }
 } 
