@@ -16,7 +16,6 @@ struct MoneyProApp: App {
             MainView()
                 .font(.system(size: 17, weight: .regular, design: .rounded))
                 .lockOrientation(.portrait)
-                .environment(\.managedObjectContext, CoreDataManager.shared.viewContext)
         }
     }
 }

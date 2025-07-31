@@ -3,70 +3,106 @@ import SwiftUI
 struct SettingView: View {
     @Binding var isPresented: Bool
     let onDismiss: () -> Void
+    @State private var notificationsEnabled = true
     
-    @StateObject private var backupService = BackupService.shared
+    // MARK: - Computed Properties
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(version) (\(build))"
+    }
     
-    @State private var slideOffset: CGFloat = UIScreen.main.bounds.height
-    @State private var isClosing = false
-    @State private var showingBackupAlert = false
-    @State private var showingRestoreAlert = false
-    @State private var showingDeleteAlert = false
-    @State private var backupMessage = ""
+
     
     var body: some View {
         ZStack {
-            // Background overlay scuro
-            Color.black.opacity(0.3)
+            Colors.primaryBackground
                 .ignoresSafeArea()
-                .onTapGesture {
-                    dismissView()
-                }
             
-            // Contenuto principale
             VStack(spacing: 0) {
-                Spacer()
-                
+                headerView
+
                 VStack(spacing: 0) {
-                    headerView
-                    
-                    // Area contenuto
-                    VStack(spacing: 20) {
-                        backupSection
-                        Spacer()
+                    // Notifiche
+                    settingsRow(
+                        icon: "ic_notifications",
+                        title: "Notifiche",
+                        showSwitch: true,
+                        isOn: $notificationsEnabled
+                    ) {
+                        // Toggle notifications
+                        notificationsEnabled.toggle()
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
+                    
+                    // Segnala un Bug
+                    settingsRow(
+                        icon: "ic_bug",
+                        title: "Segnala un Bug",
+                        showSwitch: false
+                    ) {
+                        reportBug()
+                    }
+
+                    // Vota su App Store
+                    settingsRow(
+                        icon: "ic_star",
+                        title: "Vota su App Store",
+                        showSwitch: false
+                    ) {
+                        rateOnAppStore()
+                    }
+                    
+                    // Condividi l'App
+                    settingsRow(
+                        icon: "ic_share",
+                        title: "Condividi l'App",
+                        showSwitch: false
+                    ) {
+                        shareApp()
+                    }
+                    
+                    // Segui su Instagram
+                    settingsRow(
+                        icon: "ic_instagram",
+                        title: "Segui su Instagram",
+                        showSwitch: false
+                    ) {
+                        followOnInstagram()
+                    }
+                    
+                    Spacer()
+                    
+                    // Footer con nome app e versione
+                    VStack(spacing: 4) {
+                        Text("Money Pro")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(Colors.primaryText)
+                        
+                        Text("Versione \(appVersion)")
+                            .font(.system(size: 14, weight: .regular, design: .rounded))
+                            .foregroundColor(Colors.secondaryText)
+                    }
+                    .padding(.bottom, 30)
                 }
-                .frame(maxWidth: .infinity, minHeight: UIScreen.main.bounds.height * 0.8)
-                .background(Color.white)
-                .cornerRadius(20, corners: [.topLeft, .topRight])
-                .offset(y: slideOffset)
+                .padding(.top, 20)
             }
-            .background(Color.white)
-            .ignoresSafeArea(.container, edges: .bottom)
         }
-        .background(Color.white)
         .onAppear {
             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
             impactFeedback.impactOccurred()
-            withAnimation(.easeOut(duration: 0.3)) {
-                slideOffset = 0
-            }
         }
     }
     
     // MARK: - Header
     private var headerView: some View {
         VStack(spacing: 0) {
-
-            
             // Header con pulsanti
             HStack {
-                // Tasto X a sinistra
+                // Tasto freccia a sinistra
                 Button(action: { 
-                    dismissView()
+                    isPresented = false
                 }) {
-                    Image(systemName: "xmark")
+                    Image(systemName: "chevron.down")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Colors.secondaryText)
                         .frame(width: 44, height: 44)
@@ -92,158 +128,122 @@ struct SettingView: View {
             }
         }
         .padding(.horizontal, 20)
-        .allowsHitTesting(true)
+        .padding(.top, 20)
+        .padding(.bottom, 0)
     }
     
-    // MARK: - Backup Section
-    private var backupSection: some View {
-        VStack(spacing: 16) {
-            Text("Backup e Ripristino")
-                .font(AppFonts.headline)
-                .foregroundColor(Colors.primaryText)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            VStack(spacing: 12) {
-                // Backup Manuale
-                Button(action: {
-                    createManualBackup()
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.up.doc")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(Colors.primaryText)
-                        Text("Crea Backup")
-                            .font(AppFonts.body)
-                            .foregroundColor(Colors.primaryText)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Colors.secondaryBackground)
-                    .cornerRadius(12)
+    // MARK: - Settings Row
+    private func settingsRow(
+        icon: String,
+        title: String,
+        showSwitch: Bool,
+        isOn: Binding<Bool>? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                // Icona
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(iconBackgroundColor(for: icon))
+                        .frame(width: 42, height: 42)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.outlineColor, lineWidth: 1)
+                        )
+                    
+                    Image(icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 22, height: 22)
+                        .foregroundColor(.white)
                 }
                 
-                // Ripristina Backup
-                Button(action: {
-                    showingRestoreAlert = true
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.down.doc")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(Colors.primaryText)
-                        Text("Ripristina Backup")
-                            .font(AppFonts.body)
-                            .foregroundColor(Colors.primaryText)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Colors.secondaryBackground)
-                    .cornerRadius(12)
-                }
+                // Titolo
+                Text(title)
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .foregroundColor(Colors.primaryText)
                 
-                // Elimina Backup
-                if backupService.hasBackup() {
-                    Button(action: {
-                        showingDeleteAlert = true
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Colors.errorText)
-                            Text("Elimina Backup")
-                                .font(AppFonts.body)
-                                .foregroundColor(Colors.errorText)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(Colors.error.opacity(0.3))
-                        .cornerRadius(12)
-                    }
+                Spacer()
+                
+                // Switch o freccia
+                if showSwitch, let isOn = isOn {
+                    Toggle("", isOn: isOn)
+                        .toggleStyle(SwitchToggleStyle(tint: Colors.primaryColor))
+                        .labelsHidden()
+                        .scaleEffect(0.8)
+                        .padding(.trailing, -6)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Colors.secondaryText)
                 }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(Colors.primaryBackground)
         }
-        .padding(.horizontal, 20)
-        .alert("Backup Creato", isPresented: $showingBackupAlert) {
-            Button("OK") { }
-        } message: {
-            Text(backupMessage)
-        }
-        .alert("Ripristina Backup", isPresented: $showingRestoreAlert) {
-            Button("Annulla", role: .cancel) { }
-            Button("Ripristina", role: .destructive) {
-                restoreBackup()
-            }
-        } message: {
-            Text("Sei sicuro di voler ripristinare il backup? Questa azione sovrascriverà tutti i dati attuali.")
-        }
-        .alert("Elimina Backup", isPresented: $showingDeleteAlert) {
-            Button("Annulla", role: .cancel) { }
-            Button("Elimina", role: .destructive) {
-                deleteBackup()
-            }
-        } message: {
-            Text("Sei sicuro di voler eliminare il backup? Questa azione non può essere annullata.")
-        }
+        .buttonStyle(PlainButtonStyle())
     }
     
-    // MARK: - Backup Functions
-    private func createManualBackup() {
-        if let backupData = backupService.createManualBackup() {
-            backupMessage = "Backup creato con successo! I tuoi dati sono ora salvati in modo sicuro."
-            showingBackupAlert = true
-        } else {
-            backupMessage = "Errore nella creazione del backup. Riprova più tardi."
-            showingBackupAlert = true
-        }
-    }
-    
-    private func restoreBackup() {
-        if backupService.restoreFromAutomaticBackup() {
-            backupMessage = "Backup ripristinato con successo!"
-            showingBackupAlert = true
-        } else {
-            backupMessage = "Nessun backup trovato o errore nel ripristino."
-            showingBackupAlert = true
-        }
-    }
-    
-    private func deleteBackup() {
-        backupService.deleteBackup()
-        backupMessage = "Backup eliminato con successo."
-        showingBackupAlert = true
-    }
-    
-    // MARK: - Dismiss
-    private func dismissView() {
-        // Prima chiama onDismiss per rendere visibile la pagina sottostante
-        onDismiss()
+    // MARK: - Actions
+    private func reportBug() {
+        let email = "marcocomizzoli2002@gmail.com"
+        let subject = "Segnalazione di un Bug"
+        let mailtoString = "mailto:\(email)?subject=\(subject)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         
-        // Poi anima la chiusura
-        withAnimation(.easeInOut(duration: 0.3)) {
-            isClosing = true
-            slideOffset = UIScreen.main.bounds.height
+        if let url = URL(string: mailtoString) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    private func rateOnAppStore() {
+        // Sostituisci con l'ID della tua app
+        let appStoreURL = "https://apps.apple.com/app/id1234567890"
+        if let url = URL(string: appStoreURL) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    private func shareApp() {
+        let appStoreURL = "https://apps.apple.com/app/id1234567890"
+        let activityVC = UIActivityViewController(
+            activityItems: [appStoreURL],
+            applicationActivities: nil
+        )
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.rootViewController?.present(activityVC, animated: true)
+        }
+    }
+    
+    private func followOnInstagram() {
+        let instagramURL = "https://www.instagram.com/marcocomizzolii"
+        if let url = URL(string: instagramURL) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    // MARK: - Icon Colors
+    private func iconBackgroundColor(for icon: String) -> Color {
+        switch icon {
+        case "ic_notifications":
+            return Color(hex: "#489cfe") // Rosa scuro
+        case "ic_bug":
+            return Color(hex: "#f54c4c") // Corallo scuro
+        case "ic_star":
+            return Color(hex: "#faba22") // Giallo scuro
+        case "ic_share":
+            return Color(hex: "#5bca78") // Verde scuro
+        case "ic_instagram":
+            return Color(hex: "#9190a7") // Viola scuro
+        default:
+            return Colors.primaryBackground
         }
     }
 }
 
-// MARK: - Corner Radius Extension
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-}
-
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
 
 #if DEBUG
 #Preview {

@@ -39,6 +39,9 @@ struct WelcomeView: View {
                     // Feature 1
                     HStack(spacing: 16) {
                         Image("ic_plus")
+                            .renderingMode(.template)
+                            .interpolation(.high)
+                            .antialiased(true)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 40, height: 40)
@@ -61,6 +64,9 @@ struct WelcomeView: View {
                     // Feature 2
                     HStack(spacing: 16) {
                         Image("ic_chart")
+                            .renderingMode(.template)
+                            .interpolation(.high)
+                            .antialiased(true)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 40, height: 40)
@@ -83,6 +89,9 @@ struct WelcomeView: View {
                     // Feature 3
                     HStack(spacing: 16) {
                         Image("ic_target")
+                            .renderingMode(.template)
+                            .interpolation(.high)
+                            .antialiased(true)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 40, height: 40)

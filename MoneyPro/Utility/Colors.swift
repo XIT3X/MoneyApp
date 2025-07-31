@@ -30,8 +30,18 @@ extension Color {
 struct Colors {
     
     //Test Color
-    static let testColor1 = Color(red: 100, green: 0, blue: 0)
-    static let testColor2 = Color(red: 0, green: 100, blue: 0)
+    static let testColor1 = Color(red: 1.0, green: 0, blue: 0) // Rosso
+    static let testColor2 = Color(red: 0, green: 1.0, blue: 0) // Verde
+    
+    // Lime Green for Categories - Transizione graduale verso outline
+// Verde lime originale
+    static let limeGreen2 = Color(hex: "#e0f0a0") // Verde lime con più grigio
+    static let limeGreen3 = Color(hex: "#e3f0c0") // Verde lime con ancora più grigio
+    static let limeGreen4 = Color(hex: "#e6f0d0") // Verde lime che si avvicina all'outline
+    static let limeGreen5 = Color(hex: "#e8f0e0") // Verde lime molto vicino all'outline
+    static let limeGreen6 = Color(hex: "#eaefe4") // Verde lime quasi outline
+    static let limeGreen7 = Color(hex: "#eceff0") // Verde lime molto simile all'outline
+    static let limeGreen8 = Color(hex: "#ecf0f4") // Colore outline finale
     
     // Background Colors
     static let primaryBackground = Color(hex: "#FFFFFF")
@@ -45,11 +55,13 @@ struct Colors {
     static let outlineColor = Color(hex: "#ecf0f4")
 
     // Accent Colors
-    static let primaryColor = Color(hex: "#3c3c3c")
+    static let primaryColor = Color(hex: "#3c3c3c") //3c3c3c
     
     // Extra Color
     static let error = Color(hex: "#ffd4d1")
     static let errorText = Color(hex: "#fe473a")
+    static let limeGreen = Color(hex: "#ddef75")
+    static let limeGreenText = Color(hex: "#95cc25")
     static let incoming = Color(hex: "#00B4D8")
 
     static let categoriaCibo = Color(hex: "#FF6B6B")
@@ -62,4 +74,13 @@ struct Colors {
     static let categoriaRegalo = Color(hex: "#A29BFE")
     static let categoriaBonus = Color(hex: "#FD79A8")
     static let categoriaBonus2 = Color(hex: "#00B894")
+    
+    // Nuovi colori per evitare ripetizioni
+    static let categoriaTrasporti = Color(hex: "#6C5CE7")
+    static let categoriaSport = Color(hex: "#E84393")
+    static let categoriaViaggi = Color(hex: "#00B894")
+    static let categoriaAnimali = Color(hex: "#FAB1A0")
+    static let categoriaSpesa = Color(hex: "#74B9FF")
+    static let categoriaRegali = Color(hex: "#A29BFE")
+    static let categoriaInvestimenti = Color(hex: "#55A3FF")
 }

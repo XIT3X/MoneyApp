@@ -442,10 +442,8 @@ struct CategoryView: View {
                         Button(action: {
                             deleteCategory()
                         }) {
-                            Image("ic_trash")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 22, height: 22)
+                            Image(systemName: "trash")
+                                .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(Colors.errorText)
                                 .frame(width: 44, height: 44)
                                 .background(Colors.error)
