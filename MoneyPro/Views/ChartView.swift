@@ -223,10 +223,12 @@ struct ChartView: View {
                             if getExpenseCategories().isEmpty {
                 // Messaggio quando non ci sono spese
                 VStack(spacing: 12) {
-                    Image(systemName: "arrow.down")
-                        .rotationEffect(.degrees(-45))
-                        .font(.system(size: 24))
-                        .foregroundColor(Colors.secondaryText.opacity(0.6))
+                    Image("ic_exp")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 28, height: 28)
+                        .foregroundColor(Colors.secondaryText.opacity(0.8))
+                        .font(.title3.bold())
                     
                     Text("Nessuna spesa in questo periodo")
                         .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -273,10 +275,12 @@ struct ChartView: View {
             if getIncomeCategories().isEmpty {
                 // Messaggio quando non ci sono entrate
                 VStack(spacing: 16) {
-                    Image(systemName: "arrow.down")
-                        .rotationEffect(.degrees(-135))
-                        .font(.system(size: 24))
-                        .foregroundColor(Colors.secondaryText.opacity(0.6))
+                    Image("ic_inc")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 28, height: 28)
+                        .foregroundColor(Colors.secondaryText.opacity(0.8))
+                        .font(.title3.bold())
                     
                     Text("Nessuna entrata in questo periodo")
                         .font(.system(size: 16, weight: .medium, design: .rounded))

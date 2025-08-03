@@ -39,9 +39,13 @@ private struct ExpenseCard: View {
                 
                 Spacer()
                 
-                Image(systemName: "arrow.down.right")
-                    .foregroundColor(Colors.errorText)
-                    .font(.title3)
+                Image("ic_exp")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 26, height: 26)
+                    .foregroundColor(Colors.errorText.opacity(0.8))
+                    .font(.title3.bold())
+                    .padding(.top, -4)
             }
             
             Text(amount.formattedAmount)
@@ -90,12 +94,13 @@ private struct IncomeCard: View {
                     .foregroundColor(Colors.secondaryText)
                 
                 Spacer()
-                Image("ic_extra")
+                Image("ic_inc")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 27, height: 27)
+                    .frame(width: 26, height: 26)
                     .foregroundColor(Colors.limeGreenText)
-                    .font(.title3)
+                    .font(.title3.bold())
+                    .padding(.top, -4)
         }
             
             Text(amount.formattedAmount)
