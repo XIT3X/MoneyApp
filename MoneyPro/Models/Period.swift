@@ -5,12 +5,12 @@ enum Period: String, CaseIterable {
     
     var displayName: String {
         switch self {
-        case .from1st: return "dal 1 del mese"
-        case .from5th: return "dal 5 del mese"
-        case .from10th: return "dal 10 del mese"
-        case .from15th: return "dal 15 del mese"
-        case .from20th: return "dal 20 del mese"
-        case .from25th: return "dal 25 del mese"
+        case .from1st: return "Dal 1 del mese"
+        case .from5th: return "Dal 5 del mese"
+        case .from10th: return "Dal 10 del mese"
+        case .from15th: return "Dal 15 del mese"
+        case .from20th: return "Dal 20 del mese"
+        case .from25th: return "Dal 25 del mese"
         }
     }
     
@@ -73,6 +73,8 @@ enum Period: String, CaseIterable {
     
     private func formatPeriodRange(start: Date, end: Date) -> String {
         let calendar = Calendar.current
+        let now = Date()
+        let currentYear = calendar.component(.year, from: now)
         
         let startDay = calendar.component(.day, from: start)
         let endDay = calendar.component(.day, from: end)
@@ -87,7 +89,14 @@ enum Period: String, CaseIterable {
                 let monthFormatter = DateFormatter()
                 monthFormatter.locale = Locale(identifier: "it_IT")
                 monthFormatter.dateFormat = "MMMM"
-                return monthFormatter.string(from: start).capitalized
+                let monthName = monthFormatter.string(from: start).capitalized
+                
+                // Add year if it's different from current year
+                if startYear != currentYear {
+                    return "\(monthName) \(startYear)"
+                } else {
+                    return monthName
+                }
             }
         }
         
@@ -99,6 +108,12 @@ enum Period: String, CaseIterable {
         let startStr = formatter.string(from: start)
         let endStr = formatter.string(from: end)
         
-        return "\(startStr) - \(endStr)"
+        // Add year to start date if it's different from current year
+        var result = "\(startStr) - \(endStr)"
+        if startYear != currentYear {
+            result = "\(startStr) \(startYear) - \(endStr)"
+        }
+        
+        return result
     }
 }

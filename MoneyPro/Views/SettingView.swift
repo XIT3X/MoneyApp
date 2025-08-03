@@ -1,8 +1,10 @@
 import SwiftUI
+import StoreKit
 
 struct SettingView: View {
     @Binding var isPresented: Bool
     let onDismiss: () -> Void
+    @StateObject private var settingsManager = SettingsManager()
     @State private var notificationsEnabled = true
     
     // MARK: - Computed Properties
@@ -23,51 +25,63 @@ struct SettingView: View {
                 headerView
 
                 VStack(spacing: 0) {
-                    // Notifiche
-                    settingsRow(
-                        icon: "ic_notifications",
-                        title: "Notifiche",
-                        showSwitch: true,
-                        isOn: $notificationsEnabled
-                    ) {
-                        // Toggle notifications
-                        notificationsEnabled.toggle()
+                    // Sezione App
+                    settingsSection(title: "Generali") {
+                        // Notifiche
+                        settingsRow(
+                            icon: "ic_notifications",
+                            title: "Notifiche",
+                            showSwitch: true,
+                            isOn: $notificationsEnabled
+                        ) {
+                            // Toggle notifications
+                            notificationsEnabled.toggle()
+                        }
+                        .padding(.bottom, -5)
+                    }
+                    .padding(.bottom, 10)
+                    
+                    // Sezione Supporto
+                    settingsSection(title: "Supporto") {
+                        // Segnala un Bug
+                        settingsRow(
+                            icon: "ic_bug",
+                            title: "Segnala un Bug",
+                            showSwitch: false
+                        ) {
+                            reportBug()
+                        }
+                        
+                        // Vota su App Store
+                        settingsRow(
+                            icon: "ic_star",
+                            title: "Vota su App Store",
+                            showSwitch: false
+                        ) {
+                            rateOnAppStore()
+                        }
+                        
+                        // Condividi l'App
+                        settingsRow(
+                            icon: "ic_share",
+                            title: "Condividi l'App",
+                            showSwitch: false
+                        ) {
+                            shareApp()
+                        }
                     }
                     
-                    // Segnala un Bug
-                    settingsRow(
-                        icon: "ic_bug",
-                        title: "Segnala un Bug",
-                        showSwitch: false
-                    ) {
-                        reportBug()
-                    }
-
-                    // Vota su App Store
-                    settingsRow(
-                        icon: "ic_star",
-                        title: "Vota su App Store",
-                        showSwitch: false
-                    ) {
-                        rateOnAppStore()
-                    }
-                    
-                    // Condividi l'App
-                    settingsRow(
-                        icon: "ic_share",
-                        title: "Condividi l'App",
-                        showSwitch: false
-                    ) {
-                        shareApp()
-                    }
-                    
-                    // Segui su Instagram
-                    settingsRow(
-                        icon: "ic_instagram",
-                        title: "Segui su Instagram",
-                        showSwitch: false
-                    ) {
-                        followOnInstagram()
+                    .padding(.bottom, 10)
+                    // Sezione Social
+                    settingsSection(title: "Social") {
+                        // Segui su Instagram
+                        settingsRow(
+                            icon: "ic_instagram",
+                            title: "Segui su Instagram",
+                            showSwitch: false
+                        ) {
+                            followOnInstagram()
+                        }
                     }
                     
                     Spacer()
@@ -84,7 +98,7 @@ struct SettingView: View {
                     }
                     .padding(.bottom, 30)
                 }
-                .padding(.top, 20)
+                .padding(.top, 10)
             }
         }
         .onAppear {
@@ -98,20 +112,16 @@ struct SettingView: View {
         VStack(spacing: 0) {
             // Header con pulsanti
             HStack {
-                // Tasto freccia a sinistra
+                // Tasto X per chiudere
                 Button(action: { 
                     isPresented = false
                 }) {
-                    Image(systemName: "chevron.down")
+                    Image(systemName: "xmark")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Colors.secondaryText)
                         .frame(width: 44, height: 44)
                         .background(Colors.primaryBackground)
                         .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Colors.outlineColor, lineWidth: 1)
-                        )
                 }
                 .buttonStyle(PlainButtonStyle())
                 .contentShape(Rectangle())
@@ -128,8 +138,38 @@ struct SettingView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .padding(.bottom, 0)
+        .padding(.top, 5) // Spazio sopra ridotto a 5 punti
+    }
+    
+    // MARK: - Settings Section
+    private func settingsSection<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(spacing: 0) {
+            // Section header
+            HStack {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(Colors.secondaryText)
+                    .textCase(.uppercase)
+                    .tracking(0.5)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 30)
+            .padding(.top, 15)
+            
+            // Divider
+            Rectangle()
+                .fill(Colors.outlineColor)
+                .frame(height: 1)
+                .padding(.horizontal, 30)
+                .padding(.top, 8)
+            
+            // Section content
+            content()
+        }
     }
     
     // MARK: - Settings Row
@@ -142,23 +182,6 @@ struct SettingView: View {
     ) -> some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                // Icona
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(iconBackgroundColor(for: icon))
-                        .frame(width: 42, height: 42)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Colors.outlineColor, lineWidth: 1)
-                        )
-                    
-                    Image(icon)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 22, height: 22)
-                        .foregroundColor(.white)
-                }
-                
                 // Titolo
                 Text(title)
                     .font(.system(size: 17, weight: .medium, design: .rounded))
@@ -179,8 +202,9 @@ struct SettingView: View {
                         .foregroundColor(Colors.secondaryText)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 30)
+            .padding(.top, 20)
+            .padding(.bottom, 8)
             .background(Colors.primaryBackground)
         }
         .buttonStyle(PlainButtonStyle())
@@ -198,23 +222,41 @@ struct SettingView: View {
     }
     
     private func rateOnAppStore() {
-        // Sostituisci con l'ID della tua app
-        let appStoreURL = "https://apps.apple.com/app/id1234567890"
-        if let url = URL(string: appStoreURL) {
-            UIApplication.shared.open(url)
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
         }
     }
     
     private func shareApp() {
-        let appStoreURL = "https://apps.apple.com/app/id1234567890"
+        let appStoreURL = "https://apps.apple.com/it/app/money-pro/id6749245723"
+        let shareText = "Scarica Money Pro - L'app per gestire le tue finanze in modo semplice e intuitivo! \(appStoreURL)"
+        
         let activityVC = UIActivityViewController(
-            activityItems: [appStoreURL],
+            activityItems: [shareText],
             applicationActivities: nil
         )
         
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            window.rootViewController?.present(activityVC, animated: true)
+        // Per iPad, dobbiamo impostare il popover presentation
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = UIApplication.shared.windows.first?.rootViewController?.view
+            popover.sourceRect = CGRect(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
+        // Presentazione più robusta per SwiftUI modals
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                
+                // Cerca il view controller più in alto nella gerarchia
+                var topViewController = window.rootViewController
+                while let presentedViewController = topViewController?.presentedViewController {
+                    topViewController = presentedViewController
+                }
+                
+                // Presenta il share sheet
+                topViewController?.present(activityVC, animated: true)
+            }
         }
     }
     
@@ -225,23 +267,7 @@ struct SettingView: View {
         }
     }
     
-    // MARK: - Icon Colors
-    private func iconBackgroundColor(for icon: String) -> Color {
-        switch icon {
-        case "ic_notifications":
-            return Color(hex: "#489cfe") // Rosa scuro
-        case "ic_bug":
-            return Color(hex: "#f54c4c") // Corallo scuro
-        case "ic_star":
-            return Color(hex: "#faba22") // Giallo scuro
-        case "ic_share":
-            return Color(hex: "#5bca78") // Verde scuro
-        case "ic_instagram":
-            return Color(hex: "#9190a7") // Viola scuro
-        default:
-            return Colors.primaryBackground
-        }
-    }
+
 }
 
 

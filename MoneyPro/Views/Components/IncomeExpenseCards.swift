@@ -5,23 +5,29 @@ struct IncomeExpenseCards: View {
     let income: Double
     let onExpenseTap: () -> Void
     let onIncomeTap: () -> Void
+    let onAddTransaction: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Card Spese
-            ExpenseCard(amount: expenses, onTap: onExpenseTap)
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                // Card Spese
+                ExpenseCard(amount: expenses, onTap: onExpenseTap)
+                
+                // Card Entrate
+                IncomeCard(amount: income, onTap: onIncomeTap)
+            }
             
-            // Card Entrate
-            IncomeCard(amount: income, onTap: onIncomeTap)
+            // Pulsante per aggiungere transazione
+            AddTransactionButton(action: onAddTransaction)
+            .padding(.bottom, 4)
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 20)
     }
 }
 
 private struct ExpenseCard: View {
     let amount: Double
     let onTap: () -> Void
-    @State private var isPressed = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -64,24 +70,16 @@ private struct ExpenseCard: View {
 
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: Colors.outlineColor.opacity(0.4), radius: 10, x: 0, y: 0)
-        .scaleEffect(isPressed ? 0.98 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .shadow(color: Colors.outlineColor.opacity(0.25), radius: 10, x: 0, y: 0)
         .onTapGesture {
             onTap()
         }
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
-            withAnimation(.easeInOut(duration: 0)) {
-                isPressed = pressing
-            }
-        }, perform: {})
     }
 }
 
 private struct IncomeCard: View {
     let amount: Double
     let onTap: () -> Void
-    @State private var isPressed = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -124,16 +122,53 @@ private struct IncomeCard: View {
 
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: Colors.outlineColor.opacity(0.4), radius: 10, x: 0, y: 0)
-        .scaleEffect(isPressed ? 0.98 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .shadow(color: Colors.outlineColor.opacity(0.25), radius: 10, x: 0, y: 0)
         .onTapGesture {
             onTap()
         }
+    }
+}
+
+// MARK: - Add Transaction Button with Scaling Animation
+private struct AddTransactionButton: View {
+    let action: () -> Void
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            action()
+        }) {
+            HStack {
+                Image(systemName: "plus")
+                    .foregroundColor(Colors.primaryText)
+                    .font(.system(size: 16, weight: .medium))
+                
+                Text("Aggiungi una transazione")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(Colors.primaryText)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Colors.primaryBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Colors.outlineColor, lineWidth: 2)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .shadow(color: Colors.outlineColor.opacity(0.25), radius: 10, x: 0, y: 0)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .scaleEffect(isPressed ? 0.99 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
         .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
-            withAnimation(.easeInOut(duration: 0)) {
+            withAnimation(.easeInOut(duration: 0.1)) {
                 isPressed = pressing
             }
         }, perform: {})
     }
-} 
+}

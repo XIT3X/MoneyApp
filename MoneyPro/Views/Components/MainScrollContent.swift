@@ -18,6 +18,7 @@ struct MainScrollContent: View {
     let onScrollOffsetChanged: (CGFloat) -> Void
     let onExpenseTap: () -> Void
     let onIncomeTap: () -> Void
+    let onAddTransaction: () -> Void
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -32,19 +33,20 @@ struct MainScrollContent: View {
                     )
                     .id("categorySection")
                     
+                    // Card Entrate e Spese - sempre visibili
+                    IncomeExpenseCards(
+                        expenses: expenses, 
+                        income: income,
+                        onExpenseTap: onExpenseTap,
+                        onIncomeTap: onIncomeTap,
+                        onAddTransaction: onAddTransaction
+                    )
+                        .padding(.top, 16)
+                        .padding(.bottom, 6) // Aggiunto spazio sotto i rettangoli
+                    
                     if isEmpty {
                         EmptyStateView()
                     } else {
-                        // Card Entrate e Spese
-                        IncomeExpenseCards(
-                            expenses: expenses, 
-                            income: income,
-                            onExpenseTap: onExpenseTap,
-                            onIncomeTap: onIncomeTap
-                        )
-                            .padding(.top, 16)
-                            .padding(.bottom, 6) // Aggiunto spazio sotto i rettangoli
-                        
                         TransactionListView(
                             upcomingTransactions: upcomingTransactions,
                             groupedTransactions: groupedTransactions,

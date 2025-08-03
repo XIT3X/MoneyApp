@@ -7,35 +7,33 @@ struct MainView: View {
     @State private var showingNewTransaction = false
     @State private var transactionToEdit: Transaction?
     @State private var showingSettings = false
-    @State private var showingPeriodSheet = false
-    @State private var showingExpenseView = false
-    @State private var showingIncomeView = false
     @State private var selectedCategory: String? = nil
     @State private var futureCheckTimer: Timer?
     @State private var dragOffset: CGFloat = 0
     @State private var showTotalInHeader: Bool = false
     @State private var showDivider: Bool = false
     @State private var scrollPosition: CGFloat = 0
+    @State private var isPeriodDropdownExpanded = false
+    @State private var showingChartView = false
     
     // Wave animation states
-    @State private var waveScale: [CGFloat] = [2.0]
+    @State private var waveScale: [CGFloat] = [1.0]
     @State private var waveOpacity: [Double] = [0.7]
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) { 
                 MainHeader(
-                    selectedPeriod: settingsManager.selectedPeriod,
+                    selectedPeriod: $settingsManager.selectedPeriod,
                     monthOffset: settingsManager.currentMonthOffset,
-                    showWaveAnimation: transactionManager.transactions.isEmpty,
-                    waveScale: waveScale,
-                    waveOpacity: waveOpacity,
                     netTotal: showTotalInHeader ? netTotal : nil,
                     showTotalInHeader: showTotalInHeader,
                     showDivider: showDivider,
                     onSettingsTap: { showingSettings = true },
-                    onPeriodTap: { showingPeriodSheet = true },
-                    onAddTransactionTap: { openNewTransaction() }
+                    onPeriodSelected: handlePeriodSelected,
+                    onAddTransactionTap: { openNewTransaction() },
+                    onChartTap: { showingChartView = true },
+                    isPeriodDropdownExpanded: $isPeriodDropdownExpanded
                 )
                 
                 MainScrollContent(
@@ -54,11 +52,18 @@ struct MainView: View {
                     onDragEnded: handleDragEnded,
                     onTransactionTap: openEditTransaction,
                     onScrollOffsetChanged: { offset in
+                        // Close dropdown when scrolling
+                        if isPeriodDropdownExpanded {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                isPeriodDropdownExpanded = false
+                            }
+                        }
+                        
                         // Debug print
                         // L'offset è la posizione del totale rispetto alla viewport
                         // Quando il totale esce dallo schermo di 200 punti, mostra il totale nell'header
-                        let thresholdShow: CGFloat = -260  // Soglia per far apparire il totale nell'header
-                        let thresholdHide: CGFloat = -260   // Soglia per far scomparire il totale dall'header
+                        let thresholdShow: CGFloat = -335  // Soglia per far apparire il totale nell'header
+                        let thresholdHide: CGFloat = -335   // Soglia per far scomparire il totale dall'header
                         
                         // Gestione del divider con soglie -2/-1
                         let dividerThresholdShow: CGFloat = -1
@@ -91,19 +96,45 @@ struct MainView: View {
                         // Se è tra le due soglie, mantieni lo stato attuale
                     },
                     onExpenseTap: handleExpenseTap,
-                    onIncomeTap: handleIncomeTap
+                    onIncomeTap: handleIncomeTap,
+                    onAddTransaction: openNewTransaction
                 )
                 
             }
             .background(Colors.primaryBackground)
             .navigationBarHidden(true)
+            .overlay(
+                // Global dropdown overlay positioned at the top
+                VStack {
+                    if isPeriodDropdownExpanded {
+                        Spacer()
+                            .frame(height: 70) // Set to 12 points
+                        
+                        PeriodDropdownOverlay(
+                            selectedPeriod: $settingsManager.selectedPeriod,
+                            isExpanded: $isPeriodDropdownExpanded,
+                            onPeriodSelected: handlePeriodSelected
+                        )
+                        .padding(.horizontal, 60) // Set to 60 points
+                        
+                        Spacer()
+                    }
+                }
+                .zIndex(1000)
+            )
+            .onTapGesture {
+                // Close dropdown when tapping anywhere on the main view
+                if isPeriodDropdownExpanded {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isPeriodDropdownExpanded = false
+                    }
+                }
+            }
             .setupSheets(
                 showingNewTransaction: $showingNewTransaction,
                 showingSettings: $showingSettings,
-                showingPeriodSheet: $showingPeriodSheet,
-                showingExpenseView: $showingExpenseView,
-                showingIncomeView: $showingIncomeView,
                 showingWelcome: $settingsManager.showingWelcome,
+                showingChartView: $showingChartView,
                 transactionToEdit: transactionToEdit,
                 selectedPeriod: $settingsManager.selectedPeriod,
                 onTransactionSave: handleTransactionSave,
@@ -158,14 +189,18 @@ struct MainView: View {
     
     // MARK: - Action Handlers
     private func openNewTransaction() {
+        // Vibrazione quando si apre la pagina per aggiungere una transazione
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+        
         transactionToEdit = nil
-                                                showingNewTransaction = true
-                                            }
+        showingNewTransaction = true
+    }
     
     private func openEditTransaction(_ transaction: Transaction) {
         transactionToEdit = transaction
-                                            showingNewTransaction = true
-                                        }
+        showingNewTransaction = true
+    }
     
     private func handleDragChanged(_ translation: CGFloat) {
         dragOffset = translation
@@ -184,16 +219,16 @@ struct MainView: View {
     }
     
     private func handleTransactionSave(_ transaction: Transaction) {
-                    if let editingTransaction = transactionToEdit {
+        if let editingTransaction = transactionToEdit {
             transactionManager.updateTransaction(transaction)
-                    } else {
+        } else {
             transactionManager.addTransaction(transaction)
-                    }
-                    transactionToEdit = nil
-                    showingNewTransaction = false
+        }
+        transactionToEdit = nil
+        showingNewTransaction = false
     }
     
-        private func handleTransactionDelete() {
+    private func handleTransactionDelete() {
         if let transaction = transactionToEdit {
             transactionManager.deleteTransaction(transaction)
         }
@@ -208,22 +243,22 @@ struct MainView: View {
     }
     
     private func handleExpenseTap() {
-        showingExpenseView = true
+        // Rimossa la navigazione alla pagina ExpenseView
     }
     
     private func handleIncomeTap() {
-        showingIncomeView = true
+        // Rimossa la navigazione alla pagina IncomeView
     }
     
     private func handleAppear() {
         if transactionManager.transactions.isEmpty {
-                    startWaveAnimation()
-                }
-                startFutureTransactionCheck()
-            }
+            startWaveAnimation()
+        }
+        startFutureTransactionCheck()
+    }
     
     private func handleDisappear() {
-                stopFutureTransactionCheck()
+        stopFutureTransactionCheck() 
     }
     
     // MARK: - Wave Animation
@@ -257,10 +292,8 @@ extension View {
     func setupSheets(
         showingNewTransaction: Binding<Bool>,
         showingSettings: Binding<Bool>,
-        showingPeriodSheet: Binding<Bool>,
-        showingExpenseView: Binding<Bool>,
-        showingIncomeView: Binding<Bool>,
         showingWelcome: Binding<Bool>,
+        showingChartView: Binding<Bool>,
         transactionToEdit: Transaction?,
         selectedPeriod: Binding<Period>,
         onTransactionSave: @escaping (Transaction) -> Void,
@@ -269,48 +302,25 @@ extension View {
         onWelcomeDismissed: @escaping () -> Void
     ) -> some View {
         self
-            .sheet(isPresented: showingNewTransaction) {
+            .fullScreenCover(isPresented: showingNewTransaction) {
                 NewTransactionView(transactionToEdit: transactionToEdit) { transaction in
                     onTransactionSave(transaction)
                 } onDelete: {
                     onTransactionDelete()
                 }
-                .presentationDetents([.fraction(0.92)])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(.clear)
             }
-            .sheet(isPresented: showingSettings) {
+            .fullScreenCover(isPresented: showingSettings) {
                 SettingView(isPresented: showingSettings) {
                     showingSettings.wrappedValue = false
                 }
-                .presentationDetents([.fraction(0.92)])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(.clear)
-            }
-            .sheet(isPresented: showingPeriodSheet) {
-                PeriodSelectionSheet(
-                    selectedPeriod: selectedPeriod,
-                    isPresented: showingPeriodSheet
-                ) {
-                    onPeriodSelected()
-                }
-            }
-            .sheet(isPresented: showingExpenseView) {
-                ExpenseView(isPresented: showingExpenseView)
-                    .presentationDetents([.fraction(0.92)])
-                    .presentationDragIndicator(.hidden)
-                    .presentationBackground(.clear)
-            }
-            .sheet(isPresented: showingIncomeView) {
-                IncomeView(isPresented: showingIncomeView)
-                    .presentationDetents([.fraction(0.92)])
-                    .presentationDragIndicator(.hidden)
-                    .presentationBackground(.clear)
             }
             .fullScreenCover(isPresented: showingWelcome) {
                 WelcomeView(isPresented: showingWelcome) {
                     onWelcomeDismissed()
                 }
+            }
+            .fullScreenCover(isPresented: showingChartView) {
+                ChartView(isPresented: showingChartView)
             }
     }
     

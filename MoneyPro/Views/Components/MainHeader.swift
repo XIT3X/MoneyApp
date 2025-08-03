@@ -1,17 +1,16 @@
 import SwiftUI
 
 struct MainHeader: View {
-    let selectedPeriod: Period
+    @Binding var selectedPeriod: Period
     let monthOffset: Int
-    let showWaveAnimation: Bool
-    let waveScale: [CGFloat]
-    let waveOpacity: [Double]
     let netTotal: Double?
     let showTotalInHeader: Bool
     let showDivider: Bool
     let onSettingsTap: () -> Void
-    let onPeriodTap: () -> Void
+    let onPeriodSelected: () -> Void
     let onAddTransactionTap: () -> Void
+    let onChartTap: () -> Void
+    @Binding var isPeriodDropdownExpanded: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -24,19 +23,44 @@ struct MainHeader: View {
         HStack {
             SettingsButton(onTap: onSettingsTap)
             Spacer()
-            PeriodSelector(
-                period: selectedPeriod,
-                monthOffset: monthOffset,
-                netTotal: netTotal,
-                showTotalInHeader: showTotalInHeader,
-                onTap: onPeriodTap
-            )
+            
+            // Period dropdown with total display logic
+            VStack(spacing: 2) {
+                if showTotalInHeader {
+                    // Show period description and total when needed
+                    VStack(spacing: 2) {
+                        Text(selectedPeriod.periodDescription(withMonthOffset: monthOffset))
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundColor(Colors.secondaryText)
+                        
+                        if let total = netTotal {
+                            Text(total.formattedAmount + " €")
+                                .font(AppFonts.headline)
+                                .foregroundColor(Colors.primaryText)
+                        }
+                    }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.4)),
+                        removal: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.4))
+                    ))
+                } else {
+                    // Show normal period dropdown
+                    PeriodDropdown(
+                        selectedPeriod: $selectedPeriod,
+                        isExpanded: $isPeriodDropdownExpanded,
+                        onPeriodSelected: onPeriodSelected
+                    )
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 1.2)),
+                        removal: .move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 0.8))
+                    ))
+                }
+            }
+            .animation(.easeInOut(duration: 0.15), value: showTotalInHeader)
+            
             Spacer()
-            AddTransactionButton(
-                showWaveAnimation: showWaveAnimation,
-                waveScale: waveScale,
-                waveOpacity: waveOpacity,
-                onTap: onAddTransactionTap
+            ChartButton(
+                onTap: onChartTap
             )
         }
         .padding(.horizontal, 18)
@@ -63,19 +87,13 @@ private struct SettingsButton: View {
             Image("ic_options")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 22, height: 22)
-                .foregroundColor(Colors.secondaryText)
+                .frame(width: 26, height: 26)
+                .foregroundColor(Colors.primaryColor.opacity(0.5))
                 .frame(width: 44, height: 44)
-                .background(Colors.primaryBackground)
                 .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Colors.outlineColor, lineWidth: 1)
-                )
         }
         .buttonStyle(PlainButtonStyle())
         .contentShape(Rectangle())
-        .shadow(color: Colors.outlineColor.opacity(0.4), radius: 8, x: 0, y: 0)
         .scaleEffect(isPressed ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: isPressed)
         .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
@@ -92,95 +110,48 @@ private struct SettingsButton: View {
     }
 }
 
-private struct PeriodSelector: View {
-    let period: Period
-    let monthOffset: Int
-    let netTotal: Double?
-    let showTotalInHeader: Bool
-    let onTap: () -> Void
-    @State private var isPeriodPressed = false
-    
-    private var periodDescription: String {
-        period.periodDescription(withMonthOffset: monthOffset)
-    }
-    
-    var body: some View {
-        VStack(spacing: 2) {
-            if showTotalInHeader {
-                // Mostra il periodo e il totale quando necessario
-                VStack(spacing: 2) {
-                    Text(periodDescription)
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(Colors.secondaryText)
-                    
-                    if let total = netTotal {
-                        Text(total.formattedAmount + " €")
-                            .font(AppFonts.headline)
-                            .foregroundColor(Colors.primaryText)
-                    }
-                }
-                .transition(.asymmetric(
-                    insertion: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.4)),
-                    removal: .move(edge: .bottom).combined(with: .opacity).combined(with: .scale(scale: 0.4))
-                ))
-            } else {
-                // Mostra il periodo normalmente
-                VStack(spacing: 2) {
-                    Text("Periodo")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(Colors.secondaryText)
-                    
-                    Button(action: onTap) {
-                        HStack(spacing: 4) {
-                            Text(period.displayName)
-                                .font(AppFonts.headline)
-                                .foregroundColor(Colors.primaryText)
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(Colors.secondaryText)
-                        }
-                    }
-                }
-                .scaleEffect(isPeriodPressed ? 0.95 : 1.0)
-                .animation(.easeInOut(duration: 0.1), value: isPeriodPressed)
-                .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
-                    withAnimation(.easeInOut(duration: 0.1)) {
-                        isPeriodPressed = pressing
-                    }
-                }, perform: {})
-                .transition(.asymmetric(
-                    insertion: .move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 1.2)),
-                    removal: .move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 0.8))
-                ))
-            }
-        }
-        .animation(.easeInOut(duration: 0.15), value: showTotalInHeader)
-    }
-}
+
 
 private struct AddTransactionButton: View {
-    let showWaveAnimation: Bool
-    let waveScale: [CGFloat]
-    let waveOpacity: [Double]
     let onTap: () -> Void
     @State private var isPressed = false
     
     var body: some View {
         Button(action: handleTap) {
-            ZStack {
-                WaveAnimationLayer(
-                    showWaveAnimation: showWaveAnimation,
-                    waveScale: waveScale,
-                    waveOpacity: waveOpacity
-                )
-                
-                PlusIcon()
-            }
-            .frame(width: 44, height: 44)
+            PlusIcon()
+                .frame(width: 44, height: 44)
         }
         .buttonStyle(PlainButtonStyle())
         .contentShape(Rectangle())
-        .shadow(color: Colors.outlineColor.opacity(0.4), radius: 8, x: 0, y: 0)
+        .shadow(color: Colors.outlineColor.opacity(0.25), radius: 8, x: 0, y: 0)
+        .scaleEffect(isPressed ? 0.95 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
+            withAnimation(.easeInOut(duration: 0.1)) {
+                isPressed = pressing
+            }
+        }, perform: {})
+    }
+    
+    private func handleTap() {
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+        onTap()
+    }
+}
+
+private struct ChartButton: View {
+    let onTap: () -> Void
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: handleTap) {
+            PlusIcon()
+                .frame(width: 44, height: 44)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())
+        .shadow(color: Colors.outlineColor.opacity(0.25), radius: 8, x: 0, y: 0)
         .scaleEffect(isPressed ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: isPressed)
         .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
@@ -220,15 +191,12 @@ private struct WaveAnimationLayer: View {
 
 private struct PlusIcon: View {
     var body: some View {
-        Image(systemName: "plus")
-            .font(.system(size: 18, weight: .bold))
-            .foregroundColor(Colors.secondaryText)
-            .frame(width: 44, height: 44)
-            .background(Colors.primaryBackground)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Colors.outlineColor, lineWidth: 1)
-            )
+            Image("ic_chart")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 27, height: 27)
+                .foregroundColor(Colors.primaryColor.opacity(0.5))
+                .frame(width: 44, height: 44)
+                .cornerRadius(12)
     }
 }

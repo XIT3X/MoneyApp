@@ -99,7 +99,6 @@ struct NewTransactionView: View {
                         slidingPanelView()
                             .frame(height: 340)
                     }
-                    .ignoresSafeArea(.container, edges: .bottom)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     .padding(.bottom, -10) // Sposta verso il basso di 10 punti
                 }
@@ -163,7 +162,6 @@ struct NewTransactionView: View {
             )
             .modifier(KeyboardAwareModifier())
             .ignoresSafeArea(.keyboard, edges: .bottom)
-            .ignoresSafeArea(.container, edges: .top)
             .onTapGesture {
                 hideKeyboard()
             }
@@ -178,24 +176,15 @@ struct NewTransactionView: View {
                     }
                 }
                 
-                // Se stiamo modificando una transazione, popola i campi
-                if let editingTransaction = transactionToEdit {
-                    description = editingTransaction.description
-                    amount = String(abs(editingTransaction.amount))
-                    category = editingTransaction.category
-                    date = editingTransaction.date
-                    isExpense = editingTransaction.amount < 0
-                } else {
-                    // Imposta le categorie di default per nuova transazione
-                    if isExpense {
-                        category = "Cibo"
-                    } else {
-                        category = "Stipendio"
-                    }
+                // Inizializza i dati se si sta modificando una transazione
+                if let transaction = transactionToEdit {
+                    description = transaction.description
+                    amount = String(format: "%.2f", abs(transaction.amount))
+                    category = transaction.category
+                    date = transaction.date
+                    isExpense = transaction.amount < 0
                 }
             }
-            
-            
         }
     }
     
@@ -203,16 +192,12 @@ struct NewTransactionView: View {
     private var headerView: some View {
         HStack {
             Button(action: { dismiss() }) {
-                Image(systemName: "chevron.down")
+                Image(systemName: "xmark")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(Colors.secondaryText)
+                    .foregroundColor(Colors.primaryColor.opacity(0.6))
                     .frame(width: 44, height: 44)
                     .background(Colors.primaryBackground)
                     .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Colors.outlineColor, lineWidth: 1)
-                    )
             }
             .buttonStyle(PlainButtonStyle())
             .contentShape(Rectangle())
@@ -230,13 +215,12 @@ struct NewTransactionView: View {
                         .renderingMode(.template)
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
-                        .foregroundColor(Colors.errorText)
+                        .foregroundColor(Colors.errorText.opacity(0.7))
                         .frame(width: 44, height: 44)
-                        .background(Colors.error)
                         .cornerRadius(12)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Colors.errorText.opacity(0.1), lineWidth: 1)
+                                .stroke(Colors.errorText.opacity(0.3), lineWidth: 1)
                         )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -247,7 +231,7 @@ struct NewTransactionView: View {
             // Toggle Spesa/Entrata
             HStack(spacing: 0) {
                 ZStack(alignment: isExpense ? .leading : .trailing) {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 22)
                         .fill(Colors.secondaryBackground)
                         .frame(width: 80, height: 44)
                         .animation(.easeInOut(duration: 0.25), value: isExpense)
@@ -262,7 +246,7 @@ struct NewTransactionView: View {
                                 .foregroundColor(isExpense ? Colors.primaryColor : Colors.secondaryText)
                                 .frame(width: 80, height: 44)
                                 .background(isExpense ? Colors.secondaryBackground : Color.clear)
-                                .cornerRadius(12)
+                                .cornerRadius(22)
                         }
                         .buttonStyle(PlainButtonStyle())
                         Button(action: {
@@ -275,21 +259,21 @@ struct NewTransactionView: View {
                                 .foregroundColor(!isExpense ? Colors.primaryColor : Colors.secondaryText)
                                 .frame(width: 80, height: 44)
                                 .background(!isExpense ? Colors.secondaryBackground : Color.clear)
-                                .cornerRadius(12)
+                                .cornerRadius(22)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .background(Colors.primaryBackground)
-                .cornerRadius(12)
+                .cornerRadius(22)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 22)
                         .stroke(Colors.outlineColor, lineWidth: 1)
                 )
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, 10)
         .allowsHitTesting(true)
         .onAppear {
             // Forza il refresh della view quando appare
@@ -502,7 +486,6 @@ struct NewTransactionView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .frame(width: width)
-                .ignoresSafeArea(.container, edges: .bottom)
                 .id("categories-\(isExpense ? "expense" : "income")-\(customExpenseCategories.count + customIncomeCategories.count)")
                 .animation(.easeInOut(duration: 0.3), value: customExpenseCategories.count + customIncomeCategories.count)
                 .animation(.easeInOut(duration: 0.35), value: categoriesAnimationTrigger)
@@ -536,7 +519,6 @@ struct NewTransactionView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .frame(width: width)
-                .ignoresSafeArea(.container, edges: .bottom)
                 
                 // Calendario (pagina 2)
                 VStack {

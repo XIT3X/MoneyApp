@@ -1,10 +1,12 @@
 import Foundation
+import StoreKit
 
 class TransactionManager: ObservableObject {
     @Published var transactions: [Transaction] = []
     
     private let userDefaults = UserDefaults.standard
     private let transactionsKey = "transactions_key"
+    private let ratingRequestedKey = "rating_requested_key"
     
     init() {
         loadTransactions()
@@ -14,6 +16,9 @@ class TransactionManager: ObservableObject {
     func addTransaction(_ transaction: Transaction) {
         transactions.append(transaction)
         saveTransactions()
+        
+        // Controlla se mostrare il popup di valutazione
+        checkAndRequestRating()
     }
     
     func updateTransaction(_ transaction: Transaction) {
@@ -152,6 +157,28 @@ class TransactionManager: ObservableObject {
         case .from15th: return 15
         case .from20th: return 20
         case .from25th: return 25
+        }
+    }
+    
+    // MARK: - Rating Request
+    private func checkAndRequestRating() {
+        // Controlla se il popup è già stato mostrato
+        let ratingRequested = userDefaults.bool(forKey: ratingRequestedKey)
+        
+        if !ratingRequested && transactions.count >= 2 {
+            // Mostra il popup di valutazione
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.requestRating()
+            }
+            
+            // Marca come già richiesto
+            userDefaults.set(true, forKey: self.ratingRequestedKey)
+        }
+    }
+    
+    private func requestRating() {
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
         }
     }
 }

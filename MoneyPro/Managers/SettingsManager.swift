@@ -4,16 +4,19 @@ class SettingsManager: ObservableObject {
     @Published var selectedPeriod: Period
     @Published var currentMonthOffset: Int
     @Published var showingWelcome: Bool
+    @Published var selectedCurrency: Currency
     
     private let userDefaults = UserDefaults.standard
     private let selectedPeriodKey = "selected_period_key"
     private let monthOffsetKey = "month_offset_key"
     private let welcomeKey = "hasSeenWelcome"
+    private let selectedCurrencyKey = "selected_currency_key"
     
     init() {
         self.selectedPeriod = Self.loadSelectedPeriod()
         self.currentMonthOffset = Self.loadMonthOffset()
         self.showingWelcome = !userDefaults.bool(forKey: welcomeKey)
+        self.selectedCurrency = Self.loadSelectedCurrency()
     }
     
     // MARK: - Public Methods
@@ -38,6 +41,11 @@ class SettingsManager: ObservableObject {
         saveMonthOffset(0)
     }
     
+    func updateCurrency(_ currency: Currency) {
+        selectedCurrency = currency
+        saveSelectedCurrency(currency)
+    }
+    
     // MARK: - Private Methods
     private func saveSelectedPeriod(_ period: Period) {
         userDefaults.set(period.rawValue, forKey: selectedPeriodKey)
@@ -57,5 +65,17 @@ class SettingsManager: ObservableObject {
     
     private static func loadMonthOffset() -> Int {
         return UserDefaults.standard.integer(forKey: "month_offset_key")
+    }
+    
+    private func saveSelectedCurrency(_ currency: Currency) {
+        userDefaults.set(currency.rawValue, forKey: selectedCurrencyKey)
+    }
+    
+    private static func loadSelectedCurrency() -> Currency {
+        if let currencyString = UserDefaults.standard.string(forKey: "selected_currency_key"),
+           let currency = Currency(rawValue: currencyString) {
+            return currency
+        }
+        return .euro
     }
 }

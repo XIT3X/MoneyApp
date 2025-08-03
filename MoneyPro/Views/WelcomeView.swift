@@ -8,7 +8,6 @@ struct WelcomeView: View {
         ZStack {
             // Background
             Colors.primaryBackground
-                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 Spacer()
