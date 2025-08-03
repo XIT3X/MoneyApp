@@ -90,11 +90,13 @@ private struct IncomeCard: View {
                     .foregroundColor(Colors.secondaryText)
                 
                 Spacer()
-                
-                Image(systemName: "arrow.up.right")
+                Image("ic_extra")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 27, height: 27)
                     .foregroundColor(Colors.limeGreenText)
                     .font(.title3)
-            }
+        }
             
             Text(amount.formattedAmount)
                 .font(AppFonts.headline)
@@ -163,7 +165,7 @@ private struct AddTransactionButton: View {
             .shadow(color: Colors.outlineColor.opacity(0.25), radius: 10, x: 0, y: 0)
         }
         .buttonStyle(PlainButtonStyle())
-        .scaleEffect(isPressed ? 0.99 : 1.0)
+        .scaleEffect(isPressed ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: isPressed)
         .onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: { pressing in
             withAnimation(.easeInOut(duration: 0.1)) {

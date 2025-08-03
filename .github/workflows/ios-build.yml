@@ -1,0 +1,57 @@
+name: iOS Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+        
+    - name: Build project
+      run: |
+        xcodebuild -project MoneyApp.xcodeproj -scheme MoneyPro -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' build
+        
+    - name: Run tests (if any)
+      run: |
+        xcodebuild -project MoneyApp.xcodeproj -scheme MoneyPro -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' test
+        
+    - name: Archive for distribution
+      run: |
+        xcodebuild -project MoneyApp.xcodeproj -scheme MoneyPro -destination generic/platform=iOS archive -archivePath build/MoneyApp.xcarchive
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: MoneyApp-build
+        path: build/
+        
+  backup:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create backup archive
+      run: |
+        tar -czf MoneyApp-backup-$(date +%Y%m%d-%H%M%S).tar.gz .
+        
+    - name: Upload backup to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: MoneyApp-backup
+        path: MoneyApp-backup-*.tar.gz
+        retention-days: 30 
